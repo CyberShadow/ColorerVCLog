@@ -1,3 +1,5 @@
+
+
 import std.stdio;
 import std.string;
 import std.process;
@@ -11,7 +13,7 @@ alias std.string.join join;
 
 enum OUTDIR = "html" ~ sep;
 enum STYLE = 
-	`div { margin-left: 100px; margin-right: 50px; border: 1px solid #888; padding: 2px; white-space: pre-wrap; }` ~
+	`div { margin: 1px 50px 1px 100px; border: 1px solid #888; padding: 2px; white-space: pre-wrap; }` ~
 	`.Warning { background-color: #FFFF88 }` ~
 	`.CodeAnalysis { background-color: #FFAAFF }`;
 
