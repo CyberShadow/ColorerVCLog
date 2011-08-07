@@ -12,6 +12,7 @@ import std.xml;
 alias std.string.join join;
 
 enum OUTDIR = "html" ~ sep;
+enum TMPDIR = "tmp" ~ sep;
 enum STYLE = 
 	`div { margin: 1px 50px 1px 100px; border: 1px solid #888; padding: 2px; white-space: pre-wrap; }` ~
 	`.Warning { background-color: #FFFF88 }` ~
@@ -67,18 +68,21 @@ void main(string[] args)
 			continue;
 		reportFiles ~= file;
 		stderr.writeln(file);
-		auto dir = dirname(OUTDIR ~ file);
-		if (!exists(dir))
-			mkdirRecurse(dir);
-		auto htmlFile = OUTDIR ~ file ~ ".html";
-		if (exists(htmlFile))
-			continue;
 
-		auto tmpFile = htmlFile ~ ".tmp";
-		scope(exit) remove(tmpFile);
-		enforce(system(format(`colorer -ln -dc -h "%s" -o"%s"`, rootDir ~ file, tmpFile))==0);
+		auto tmpFile = TMPDIR ~ file ~ ".html";
+		auto tmpDir = dirname(tmpFile);
+		if (!exists(tmpDir))
+			mkdirRecurse(tmpDir);
 
-		auto output = File(htmlFile, "wb");
+		if (!exists(tmpFile))
+			enforce(system(format(`colorer -ln -dc -h "%s" -o"%s"`, rootDir ~ file, tmpFile))==0);
+
+		auto outFile = OUTDIR ~ file ~ ".html";
+		auto outDir = dirname(outFile);
+		if (!exists(outDir))
+			mkdirRecurse(outDir);
+
+		auto output = File(outFile, "wb");
 		auto tmp = File(tmpFile); scope(exit) tmp.close();
 		foreach (line; tmp.byLine)
 		{
