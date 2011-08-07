@@ -57,17 +57,21 @@ void main(string[] args)
 			annotationType = Annotation.Type.CodeAnalysis;
 	}
 
-	string[] htmlFiles;
+	string[] reportFiles;
 
 	foreach (file, lines; annotations)
 	{
 		if (isabs(file))
 			continue;
+		reportFiles ~= file;
 		stderr.writeln(file);
 		auto dir = dirname(OUTDIR ~ file);
 		if (!exists(dir))
 			mkdirRecurse(dir);
 		auto htmlFile = OUTDIR ~ file ~ ".html";
+		if (exists(htmlFile))
+			continue;
+
 		auto tmpFile = htmlFile ~ ".tmp";
 		scope(exit) remove(tmpFile);
 		enforce(system(format(`colorer -ln -dc -h "%s" -o"%s"`, rootDir ~ file, tmpFile))==0);
@@ -95,9 +99,10 @@ void main(string[] args)
 				foreach (annotation; lines[lineNumber])
 					output.write(`<div class="`~to!string(annotation.type)~`">` ~ encode(annotation.message) ~ `</div>`);
 		}
-
-		htmlFiles ~= htmlFile;
 	}
 
-	std.file.write(OUTDIR ~ "index.html", `<html><body><ul><li>` ~ htmlFiles.sort.join(`</li><li>`) ~ `</li></ul></body></html>`);
+	{
+		import std.algorithm, std.array;
+		std.file.write(OUTDIR ~ "index.html", `<html><body><ul>` ~ array(map!q{`<li><a href="`~a~`.html">`~a~`</a></li>`}(reportFiles.sort)).join() ~ `</ul></li></ul></body></html>`);
+	}
 }
