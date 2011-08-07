@@ -109,6 +109,6 @@ void main(string[] args)
 
 	{
 		import std.algorithm, std.array;
-		std.file.write(OUTDIR ~ "index.html", `<html><body><ul>` ~ array(map!q{`<li><a href="`~a~`.html">`~a~`</a></li>`}(reportFiles.sort)).join() ~ `</ul></li></ul></body></html>`);
+		std.file.write(OUTDIR ~ "index.html", `<html><body><ul>` ~ array(map!q{`<li><a href="`~a.replace(`\`, `/`)~`.html">`~a~`</a></li>`}(reportFiles.sort)).join() ~ `</ul></li></ul></body></html>`);
 	}
 }
